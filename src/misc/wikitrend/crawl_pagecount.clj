@@ -5,11 +5,8 @@
            java.util.zip.GZIPOutputStream)
   (:require [clojure.pprint :as pp])
   (:require [clojure.tools.logging :as logging])
+  (:require [misc.wikitrend.core :as core])
   )
-
-(defn date->calendar [d]
-  (doto (java.util.Calendar/getInstance)
-        (.setTime d) (.setTimeZone (java.util.TimeZone/getTimeZone "UTC"))))
 
 ;; date-> java.util.Date
 (defn date->urls [date]
