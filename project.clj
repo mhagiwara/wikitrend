@@ -4,6 +4,7 @@
                  [org.clojure/tools.logging "0.2.6"]
                  [org.clojure/data.json "0.2.2"]
                  [clj-time "0.5.1"]
+                 [enlive "1.1.1"]
                  ]
   :main misc.wikitrend
   )
