@@ -40,14 +40,23 @@
   )
 
 (defn -main [& args]
-  (let [opts (clj-util/cli-simple args)
-        formatter (tmf/formatters :year-month-day)
-        res (crawl-period
-             (opts :title)
-             (tmf/parse formatter (opts :st))
-             (tmf/parse formatter (opts :ed)))]
-     (doseq [[k v] (sort res)]
-       (println (str k "\t" v))
-       )
-     )
+  (let [opts (clj-util/cli-simple args)]
+    (if (opts :batch)
+      (doseq [[query i] (clj-util/indexed (clj-util/read-lines *in*))]
+        (clj-util/run-shell "/bin/zsh" "lein run -m misc.wikitrend.crawl-grok-stats "
+                            (format "--title \"%s\" " query) " --st " (opts :st)  " --ed " (opts :ed)
+                            (format " > %s%04d" (opts :dest) i))
+
+        )
+      (let [formatter (tmf/formatters :year-month-day)
+            st (tmf/parse formatter (opts :st))
+            ed (tmf/parse formatter (opts :ed))
+            res (crawl-period (opts :title) st ed)
+            ]
+        (doseq [[k v] (sort res)]
+          (println (str k "\t" v))
+          )
+        )
+      )
+    )
   )
