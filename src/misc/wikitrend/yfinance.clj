@@ -19,13 +19,12 @@
   )
 
 (defn split-by-week [yfinance st ed]
-  (loop [now st res [] c-price nil]
+  (loop [now st res [] weekly []]
     (if (or (tmc/before? now ed) (= now ed))
       (if (= (tmc/day-of-week now) 7)
-        (recur (tmc/plus now (tmc/days 1)) res nil)
+        (recur (tmc/plus now (tmc/days 1)) (conj res weekly) [])
         (let [price (yfinance now)]
-          (recur (tmc/plus now (tmc/days 1)) 
-                 (if (and (nil? c-price) price) (conj res [now price]) res) price))
+          (recur (tmc/plus now (tmc/days 1)) res (conj weekly [now price])))
         )
       res
       )
@@ -38,8 +37,11 @@
         ed (tmf/parse YMD_FORMATTER (opts :ed))
         yfinance (read-file *in*)
         ]
-    (doseq [[date price] (split-by-week yfinance st ed)]
-      (println (format "%4d-%02d-%02d\t%f" (tmc/year date) (tmc/month date) (tmc/day date) price))
+    (doseq [weekly (split-by-week yfinance st ed)]
+      (let [date (first (first weekly))
+            price (first (filter identity (map second weekly)))]
+        (println (format "%4d-%02d-%02d\t%s" (tmc/year date) (tmc/month date) (tmc/day date) price))
+        )
       )
     )
   )
